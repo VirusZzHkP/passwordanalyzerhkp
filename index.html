@@ -1,0 +1,671 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta http-equiv="Content-Language" content="en" />
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css' />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Password strength checker. Test your password </title>
+    <meta name="description"
+        content="Use this password strength checker to test your password. It shows real-time feedback and tips to create strong passwords.  We calculate password complexity, entropy, brute force time, and check in blacklists." />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script type="text/javascript" src="scripts/passtr.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link rel="icon" href="http://example.com/favicon.png">
+
+    <!-- <script type='text/javascript'
+        src='//platform-api.sharethis.com/js/sharethis.js#property=5ced9db3af7d000012cb0e7f&product=inline-share-buttons'
+        async='async'></script> -->
+    <style type="text/css">
+        /*  checkbox */
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Hide the browser's default checkbox */
+        .container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .container:hover input~.checkmark {
+            background-color: #ccc;
+        }
+
+        /* When the checkbox is checked, add a blue background */
+        .container input:checked~.checkmark {
+            background-color: #2196F3;
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the checkmark when checked */
+        .container input:checked~.checkmark:after {
+            display: block;
+        }
+
+        /* Style the checkmark/indicator */
+        .container .checkmark:after {
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        /*checkbox*/
+
+        h1,
+        h2 {
+            text-align: center
+        }
+
+        form,
+        input,
+        select,
+        textarea {
+            margin: 0;
+            padding: 0;
+        }
+
+        .lowlight {
+            color: #A0A0A0;
+        }
+
+        #pccolor,
+        #botcolor {
+            color: green
+        }
+
+        input {
+            font-size: 20px;
+            margin-bottom: 2px;
+            padding: 5px;
+        }
+
+        #passwordPwd,
+        #passwordTxt {
+            text-align: center;
+            width: 50%;
+            height: 50px;
+            border-radius: 3px;
+        }
+
+        .div_ckeck {
+            display: inline-block;
+            margin-left: 10px
+        }
+
+        h1 {
+            font-size: 40px;
+            line-height: 45px
+        }
+
+        @media all and (max-width: 800px) {
+
+            .div_ckeck {
+                display: block;
+                margin: 10px 0
+            }
+
+            #passwordPwd,
+            #scorebarBorder {
+                width: 100% !important
+            }
+
+            h1 {
+                font-size: 25px
+            }
+        }
+
+        ol,
+        ul {
+            line-height: 1.4em;
+            margin-bottom: 4px;
+            margin-top: 4px;
+        }
+
+        table {
+            /*background-color: #67A6CB; */
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        td {
+
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #67A6CB;
+            color: #fff;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        #content {
+            margin: 0 auto;
+            padding: 10px;
+            text-align: left;
+            width: 610px;
+        }
+
+        #linkstop {
+            background: #234;
+            color: #fff;
+            margin-top: -10px;
+            padding: 2px;
+        }
+
+        #linkstop a {
+            color: #fff;
+        }
+
+        #score {
+            color: #fff;
+            font-size: 20px;
+            position: absolute;
+            text-align: center;
+            z-index: 10;
+            padding-left: 5px;
+            width: 100%;
+        }
+
+        #score,
+        #rating,
+        #standards {
+            font-weight: bold;
+        }
+
+        div.exceed {
+            background-image: url(img/icons-star.png);
+        }
+
+        div.fail {
+            background-image: url(img/icon_fail.png);
+
+        }
+
+        div.pass {
+            background-image: url(img/icon-checked.png);
+        }
+
+        div.warn {
+            background-image: url(img/icon_warning.png);
+        }
+
+        #scorebar {
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            position: relative;
+            width: 50%;
+            z-index: 0;
+            border-radius: 3px;
+        }
+
+        #scorebarBorder {
+            background: #333;
+            height: 40px;
+            line-height: 40px;
+            margin-bottom: 2px;
+            width: 50%;
+            text-align: center;
+            position: relative;
+            border-radius: 3px;
+        }
+
+        #password {
+            border: 1px #000 solid;
+            font-size: 85%;
+            width: 100px;
+        }
+
+        #tablePwdScoring {
+            margin-bottom: 0 !important;
+        }
+
+        #listLegend li {
+            list-style: none;
+            padding-bottom: 4px;
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        #listLegend {
+            margin-left: 0;
+            padding-left: 0;
+        }
+
+        div.fail,
+        div.pass,
+        div.exceed,
+        div.warn {
+            background-repeat: no-repeat;
+            background-position: left top;
+            height: 25px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 25px;
+            background-size: cover;
+        }
+
+        td.exceed,
+        td.fail,
+        td.pass,
+        td.warn {
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        td.exceed {
+            background: #1C60A4;
+        }
+
+        td.fail {
+            background: #C00;
+        }
+
+        td.pass {
+            background: #093;
+        }
+
+        td.warn {
+            background: #f60;
+        }
+
+        div.box {
+
+            color: #585858;
+            height: 20px;
+            padding: 2px;
+            white-space: nowrap;
+            width: 38px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+
+        }
+
+        div.boxMinus,
+        div.boxPlus {
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 2px;
+            text-align: left;
+            white-space: nowrap;
+
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .clearNone {
+            clear: none;
+        }
+
+        .floatRight {
+            float: right;
+        }
+
+        .floatLeft {
+            float: left;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .show-row {
+            display: table-row;
+            color: #fff;
+            background-color: #ed6666;
+        }
+
+        .inline {
+            display: inline;
+        }
+
+        .noPad {
+            padding: 0;
+        }
+
+        .show {
+            display: inline !important;
+        }
+
+        .txtLg {
+            font-size: 125%;
+        }
+
+        .txtSmall {
+            font-size: 75%;
+        }
+
+        .txtCenter {
+            text-align: center;
+        }
+
+        .txtRight {
+            text-align: right;
+        }
+    </style>
+
+
+
+</head>
+
+<body>
+
+    <div id="top">
+        <div class="inner">
+            <div id="logo"><img src="https://www.antivirus.promo/img/av-promo-logo-shield.png" alt="VirusZzWarning"
+                    style="float:left;width: 35px;margin-top: -6px;margin-right: 5px;" /><a href="#"
+                    style="text-decoration:none; color:#fff">VirusZzWarning</a>
+            </div>
+
+            <!-- <nav role="custom-dropdown">
+                <div class="topmenu">
+                    <input type="checkbox" id="button">
+                    <label for="button" onclick></label>
+                    <ul>
+                        <li><a href="https://www.antivirus.promo/">Antivirus Deals</a></li>
+                        <li><a href="https://www.antivirus.promo/internet-security-deals">Internet Security Deals</a>
+                        </li>
+                        <li><a href="https://www.antivirus.promo/premium-antivirus-deals">Premium Antivirus Deals</a>
+                        </li>
+                        <li><a href="https://www.antivirus.promo/password-manager-deals">Password Manager Deals</a></li>
+                        <li><a href="https://www.antivirus.promo/internet-security-software-comparison">Internet
+                                Security Comparison</a></li>
+                    </ul>
+
+                </div>
+            </nav> -->
+
+            <div class="searchbtn">
+                <i class="fa fa-search"></i>
+            </div>
+            <!--
+<div class="dropdown" >
+  <button onclick="myFunction()" class="dropbtn"> US</button>
+  <div id="myDropdown" class="dropdown-content">
+    <a href="https://www.antivirus.promo/"> UK</a>
+  </div>
+
+    </div> -->
+
+        </div>
+
+        <div id="searchfield">
+            <form id="search"><input type="text" name="search" value="" class="biginput" id="autocomplete"
+                    placeholder="Type at least 3 letters">
+                <div id="closesrc">
+                    <i class="fa fa-window-close"></i>
+                </div>
+            </form>
+
+
+            <div id="outputcontent"></div>
+
+        </div>
+
+    </div>
+    <div class="clear"> </div>
+
+    <div class="contentwrap group">
+        <div class="inner">
+            <div class="col cleft">
+
+                <h1>PASSWORD STRENGTH CHECKER<br>
+                    TEST YOUR PASSWORD
+                </h1>
+                <p>By :- VirusZzWarning</p>
+
+                <form id="formPassword" name="formPassword">
+                    <table id="tablePwdCheck" cellspacing="1" cellpadding="5" border="0">
+                        <tbody>
+                            <tr>
+
+                                <td colspan="2">
+                                    <input type="password" id="passwordPwd" name="passwordPwd" autocomplete="off"
+                                        placeholder="Type your Password" onkeyup="chkPass(this.value);" class="">
+                                    <input type="text" id="passwordTxt" name="passwordTxt" autocomplete="off"
+                                        onkeyup="chkPass(this.value);" class="hide">
+                                    <div class="div_ckeck"><label class="container"><input type="checkbox" id="mask"
+                                                name="mask" value="1" checked="checked" onclick="togPwdMask();"> Hide
+                                            Characters<span class="checkmark"></span></label></div>
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td style="text-align:center;">
+                                    <div id="scorebarBorder">
+                                        <div id="score">Strength 0%</div>
+                                        <div id="scorebar" style="background-position: 0px center;">&nbsp;</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="padding-left:10px;"><strong>Password Complexity:</strong>
+                                    <div id="complexity" style="display:inline-block;"></div>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="padding-left:10px;"><strong>Password Entropy:</strong>
+                                    <div id="entropy" style="display:inline-block;">0 bits</div><span
+                                        style="font-weight:normal"> ( the higher, the better. Aim for at least 70 bits
+                                        )</span>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="padding-left:10px;"><strong>Brute force calculator - Estimated time to crack
+                                        password:</strong>
+                                    <div id="crack" style="font-weight:normal;"></div>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td style="padding-left:10px;"><strong>Password Blacklist Check:</strong>
+                                    <div id="blacklist" style="display:inline-block;"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table id="tablePwdStatus" cellspacing="1" cellpadding="5" border="0">
+                        <tbody>
+                            <tr>
+                                <th colspan="2">Recommended - Good password practices</th>
+                                <th class="txtCenter">Count</th>
+
+                            </tr>
+                            <tr>
+                                <td width="2%">
+                                    <div id="div_nLength" class="fail">&nbsp;</div>
+                                </td>
+                                <td width="94%">Password length <span class="lowlight">(at least 12 characters)</span>
+                                </td>
+                                <td width="2%">
+                                    <div id="nLength" class="box">0</div>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="div_nAlphaUC" class="fail">&nbsp;</div>
+                                </td>
+                                <td>Use Uppercase Letters <span class="lowlight">[A-Z]</span></td>
+                                <td>
+                                    <div id="nAlphaUC" class="box">0</div>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="div_nAlphaLC" class="fail">&nbsp;</div>
+                                </td>
+                                <td>Use Lowercase Letters <span class="lowlight">[a-z]</span></td>
+                                <td>
+                                    <div id="nAlphaLC" class="box">0</div>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="div_nNumber" class="fail">&nbsp;</div>
+                                </td>
+                                <td>Use Numbers <span class="lowlight">[0-9]</span></td>
+                                <td>
+                                    <div id="nNumber" class="box">0</div>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="div_nSymbol" class="fail">&nbsp;</div>
+                                </td>
+                                <td>Use Symbols <span class="lowlight">[!@#]</span></td>
+                                <td>
+                                    <div id="nSymbol" class="box">0</div>
+                                </td>
+
+                            </tr>
+
+                            <tr id="warnings" class="hide">
+                                <th colspan="4" style="background-color: #ed6666;">Warnings - Bad Password Practices
+                                </th>
+                            </tr>
+                            <tr id="row_nAlphasOnly" class="hide">
+                                <td width="1%">
+                                    <div id="div_nAlphasOnly" class="pass">&nbsp;</div>
+                                </td>
+                                <td width="99%" colspan="2">Your Password Contains Only Letters</td>
+
+                            </tr>
+                            <tr id="row_nNumbersOnly" class="hide">
+                                <td>
+                                    <div id="div_nNumbersOnly" class="pass">&nbsp;</div>
+                                </td>
+                                <td colspan="2">Your Password Contains Only Numbers.</td>
+
+                            </tr>
+                            <tr id="row_nRepChar" class="hide">
+                                <td>
+                                    <div id="div_nRepChar" class="pass">&nbsp;</div>
+                                </td>
+                                <td colspan="2">Your password contains Repeated Characters.</td>
+
+                            </tr>
+                            <tr id="row_nConsecAlphaUC" class="hide">
+                                <td>
+                                    <div id="div_nConsecAlphaUC" class="warn">&nbsp;</div>
+                                </td>
+                                <td colspan="2">You have too many Consecutive Uppercase Letters</td>
+
+                            </tr>
+                            <tr id="row_nConsecAlphaLC" class="hide">
+                                <td>
+                                    <div id="div_nConsecAlphaLC" class="warn">&nbsp;</div>
+                                </td>
+                                <td colspan="2">You have too many Consecutive Lowercase Letters. Try to include some
+                                    Uppercase in between.</td>
+
+                            </tr>
+                            <tr id="row_nConsecNumber" class="hide">
+                                <td>
+                                    <div id="div_nConsecNumber" class="pass">&nbsp;</div>
+                                </td>
+                                <td colspan="2">Your password contains a Number. Make sure is not related with anything
+                                    personal (birth date, house nr etc)</td>
+
+                            </tr>
+                            <tr id="row_nSeqAlpha" class="hide">
+                                <td>
+                                    <div id="div_nSeqAlpha" class="pass">&nbsp;</div>
+                                </td>
+                                <td colspan="2">Your password contains Sequential Letters (abc...)</td>
+
+                            </tr>
+                            <tr id="row_nSeqNumber" class="hide">
+                                <td>
+                                    <div id="div_nSeqNumber" class="pass">&nbsp;</div>
+                                </td>
+                                <td colspan="2">Your password contains Sequential Figures (123...). Very bad practice.
+                                </td>
+
+                            </tr>
+                            <tr id="row_nSeqSymbol" class="hide">
+                                <td>
+                                    <div id="div_nSeqSymbol" class="pass">&nbsp;</div>
+                                </td>
+                                <td colspan="2">Your password contains Sequential Symbols (!@#).</td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+
+                </form>
+
+                <div class="clear"> </div>
+            </div>
+        </div>
+<!-- End column left -->
+<div class="col cright">
+<div class="banner-right" style="text-align:center; border-bottom:1px solid #ccc">
+<p><a href="#"><span style="font-size:18px">Connect 2 Me</span></a> </p>  
+      
+</div>
+        <div id="footer">
+
+            <div class="clear"> </div>
+
+        </div>
+</body>
+
+
+</html>
